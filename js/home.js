@@ -1,4 +1,5 @@
 import { WebService } from "./webService.js"
+import { Item } from "./item.js"
 export class Home {
     constructor() {
         this.items = [];
@@ -10,6 +11,7 @@ export class Home {
 
     init = () => {
         this.getItems();
+        this.buttonOnClickListener();
     }
 
     getItems = () => {
@@ -27,8 +29,22 @@ export class Home {
             });
     }
 
+    buttonOnClickListener = () =>{
+        document.addEventListener('click', (event)=>{
+            let button = event.target;
+            let className = button.getAttribute('class');
+            let id = button.getAttribute('id');
+            let name = button.getAttribute('name');
+            let price = button.getAttribute('price');
+            let quantity = button.getAttribute('quantity');
+            let singleItem = new Item(id, name, price, quantity);
+            if(className === 'addbtn'){
+                this.addItem(singleItem);
+                document.getElementById('cartItem').innerHTML = this.generateCartListView(this.cartList);
+            }
+        })
+    }
     generateView = (data) =>{
-        console.log('Generate View',data)
         let view =`
         <h2>Select your items</h2>
         ${data.map((item)=>{
@@ -42,4 +58,31 @@ export class Home {
         `;
         return view;
     }
+
+    addItem = (item) =>{
+        let cartItem = this.cartList.find(i => i.id === item.id);
+        if(cartItem){
+            cartItem.increaseQuantity();
+        }else{
+            this.cartList.push(item);
+        }
+    }
+
+    generateCartListView = (data) =>{
+        let view =`
+        <h2> Items are here </h2>
+        ${data.map((item) =>{
+            return `
+            <div>${ item.name }</div>
+            <div>${ item.price }</div>
+            <div>${ item.quantity }</div>
+            `
+        }).join('')}
+        `;
+        return view;
+    }
+
+
+
+
 }
